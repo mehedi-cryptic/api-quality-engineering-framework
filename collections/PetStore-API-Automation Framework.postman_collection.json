@@ -1,0 +1,244 @@
+{
+	"info": {
+		"_postman_id": "4f7c9c82-8e54-4396-91b0-1b25ef13dbd7",
+		"name": "PetStore API Automation Framework",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20103137"
+	},
+	"item": [
+		{
+			"name": "Pet Creation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response=pm.response.json();\r",
+							"console.log(response);\r",
+							"\r",
+							"//pm.collectionVariables.set(\"currentPetId\", pm.iterationData.get(\"petId\"));\r",
+							"const petSchema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"required\": [\"id\", \"name\", \"status\"],\r",
+							"    \"properties\": {\r",
+							"        \"id\": {\r",
+							"            \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"name\": {\r",
+							"            \"type\": \"string\"\r",
+							"        },\r",
+							"        \"status\": {\r",
+							"            \"type\": \"string\"\r",
+							"        }\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Schema Validation\", function () {\r",
+							"    pm.response.to.have.jsonSchema(petSchema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Pet creation or post data successfull\", function(){\r",
+							"    pm.expect(response.id).equal(Number(pm.environment.get(\"petId\")));\r",
+							"} );\r",
+							"\r",
+							"pm.test( \"Response status to be 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"}\r",
+							");\r",
+							"\r",
+							"pm.test(\"response time to be under 2sec\",function(){\r",
+							"\r",
+							"pm.expect(pm.response.responseTime).to.be.below(2000)\r",
+							"\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"    pm.environment.set(\r",
+							"       \"petId\", Math.floor(Math.random()*1000)\r",
+							"    );\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\":{{petId}},\r\n  \"name\": \"dens\",\r\n  \"status\": \"available\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v3/pet",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v3",
+						"pet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pet data get",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response=pm.response.json();\r",
+							"console.log(response);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Pet Exists\", function(){\r",
+							"\r",
+							" pm.expect(response.id).to\r",
+							" .equal(Number(pm.environment.get(\"petId\")));\r",
+							"\r",
+							"\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v3/pet/{{petId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v3",
+						"pet",
+						"{{petId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a pet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response=pm.response.json();\r",
+							"console.log(response);\r",
+							"\r",
+							"pm.test(\"Status updated\", function(){\r",
+							"    pm.expect(response.status).to.equal(\"sold\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": {{petId}},\r\n  \"name\": \"GoldenRetriever\",\r\n  \"status\": \"sold\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v3/pet",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v3",
+						"pet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a pet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Pet deleted successfully\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v3/pet/{{petId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v3",
+						"pet",
+						"{{petId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Security-check-injection",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Security-check-invalidcase",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "currentPetId",
+			"value": ""
+		}
+	]
+}
